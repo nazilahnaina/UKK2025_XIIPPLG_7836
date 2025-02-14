@@ -5,7 +5,7 @@ export default function App() {
 
   return (
     <>
-        <Typography variant='h2'>UKK2025_XIIPPLG2_7836</Typography>
+        <Typography variant='h2'>UKK2025_XIIPPLG2</Typography>
     </>
 
     
