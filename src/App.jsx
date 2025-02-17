@@ -1,13 +1,17 @@
-
-import { Typography } from '@mui/material'
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./component/PrivateRoute";
+import Login from "./component/Login";
+import Register from "./component/Register";
 export default function App() {
-
   return (
-    <>
-        <Typography variant='h2'>UKK2025_XIIPPLG2</Typography>
-    </>
-
-    
+    <AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </Router>
+    </AuthProvider>
   )
 }
