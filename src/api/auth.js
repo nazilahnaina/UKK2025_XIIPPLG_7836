@@ -1,10 +1,15 @@
+import { Token } from "@mui/icons-material";
+
 const BASE_URL = "https://listyantidewi.pythonanywhere.com/";
 
 // login
 export async function login(username, password) {
     const response = await fetch("https://listyantidewi.pythonanywhere.com/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem(Token)}`
+         },
         body: JSON.stringify({ username, password }),
     });
 
