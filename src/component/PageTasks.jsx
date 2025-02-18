@@ -22,11 +22,10 @@ import {
   Tooltip
 } from "@mui/material";
 import { Add, Edit, Delete, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
-import Layout from "./layout";
+import Layout from "./Layout";
+const API_URL = "https://listyantidewi.pythonanywhere.com";
 
-// const API_URL = "https://listyantidewi.pythonanywhere.com";
-
-export default function Tasks() {
+export default function PageTasks() {
   const [categories, setCategories] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
@@ -40,12 +39,12 @@ export default function Tasks() {
   }, []);
 
   const fetchCategories = async () => {
-    const response = await axios.get(`$https://listyantidewi.pythonanywhere.com/categories`);
+    const response = await axios.get(`${API_URL}/categories`);
     setCategories(response.data);
   };
 
   const fetchTasks = async () => {
-    const response = await axios.get(`$`);
+    const response = await axios.get(`${API_URL}/tasks`);
     setTasks(response.data);
   };
 
@@ -73,19 +72,19 @@ export default function Tasks() {
   };
 
   const handleDeleteTask = async (id) => {
-    await axios.delete(`$https://listyantidewi.pythonanywhere.com/tasks/tasks/${id}`);
+    await axios.delete(`${API_URL}/tasks/${id}`);
     fetchTasks();
   };
 
   return (
     <Layout>
       <Box sx={{ ml: 2, mt: 2, maxWidth: "90%" }}>
-        <Typography variant="h5" fontWeight="bold">Tugas</Typography>
+        <Typography variant="h5" fontWeight="bold">Tasks</Typography>
         
         <Grid container spacing={1} alignItems="center" sx={{ mt: 1 }}>
           <Grid item>
             <Button variant="contained" size="small" onClick={() => setOpenCategoryDialog(true)} sx={{ background: "#6A80B9" }}>
-              Tambah Kategori
+              Add Category
             </Button>
           </Grid>
         </Grid>
@@ -93,7 +92,7 @@ export default function Tasks() {
         <Grid container spacing={1} alignItems="center" sx={{ mt: 2 }}>
           <Grid item xs={5}>
             <TextField
-              label="Tambahkan Tugas"
+              label="tasks"
               variant="outlined"
               size="small"
               value={newTask}
@@ -110,7 +109,7 @@ export default function Tasks() {
               fullWidth
               size="small"
             >
-              <MenuItem value="" disabled>Pilih Kategori</MenuItem>
+              <MenuItem value="" disabled>Category</MenuItem>
               {categories.map((category) => (
                 <MenuItem key={category.id} value={category.id}>{category.category}</MenuItem>
               ))}
@@ -119,7 +118,7 @@ export default function Tasks() {
 
           <Grid item xs={3}>
             <Button variant="contained" size="small" startIcon={<Add />} onClick={handleAddTask} sx={{ background: "#6A80B9" }}>
-              Tambah
+              Add Tasks
             </Button>
           </Grid>
         </Grid>
@@ -148,7 +147,7 @@ export default function Tasks() {
       </Box>
 
       <Dialog open={openCategoryDialog} onClose={() => setOpenCategoryDialog(false)}>
-        <DialogTitle>Tambah Kategori</DialogTitle>
+        <DialogTitle>Add Category</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
