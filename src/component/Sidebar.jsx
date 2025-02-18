@@ -21,13 +21,13 @@ export default function Sidebar() {
       <List>
         <ListItem
           button
-          onClick={() => navigate("/todolist")}
+          onClick={() => navigate("/tasks")}
           sx={{ "&:hover": { backgroundColor: "#6A80B9", color: "white" } }}
         >
           <ListItemIcon sx={{ color: "inherit" }}>
             <FormatListBulleted />
           </ListItemIcon>
-          <ListItemText primary="Daftar Tugas" />
+          <ListItemText primary="Tasks" />
         </ListItem>
 
         <ListItem
