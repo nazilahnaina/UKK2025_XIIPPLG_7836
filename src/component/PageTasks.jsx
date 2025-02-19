@@ -1,172 +1,231 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import {
-  TextField,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Grid,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  MenuItem,
-  Select,
-  Box,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  Tooltip
-} from "@mui/material";
-import { Add, Edit, Delete, CheckCircle, RadioButtonUnchecked } from "@mui/icons-material";
-import Layout from "./Layout";
-const API_URL = "https://listyantidewi.pythonanywhere.com";
+import React, { useEffect, useState } from "react";
+import { Container, Grid, Card, CardContent, Typography, IconButton, Button, Snackbar, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox } from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { getTasks, addTask, editTask, deleteTask } from "../api/tasks";
+import { getCategories, addCategory } from "../api/category";
+import { indigo, dark, succes, danger } from "../theme/color";
+import Layout from "./layout";
 
-export default function PageTasks() {
-  const [categories, setCategories] = useState([]);
+const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState("");
-  const [newCategory, setNewCategory] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [openTaskDialog, setOpenTaskDialog] = useState(false);
+  const [taskDetails, setTaskDetails] = useState({ task: "", category_id: "", id: null });
+  const [selectedTasks, setSelectedTasks] = useState([]); // Untuk menampung task yang dipilih
 
   useEffect(() => {
-    fetchCategories();
     fetchTasks();
+    fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
-    const response = await axios.get(`${API_URL}/categories`);
-    setCategories(response.data);
-  };
-
   const fetchTasks = async () => {
-    const response = await axios.get(`${API_URL}/tasks`);
-    setTasks(response.data);
+    const data = await getTasks();
+    setTasks(data);
   };
 
-  const handleAddCategory = async () => {
-    if (newCategory.trim() !== "") {
-      await axios.post(`${API_URL}/categories`, { category: newCategory });
-      fetchCategories();
-      setNewCategory("");
-      setOpenCategoryDialog(false);
-    }
+  const fetchCategories = async () => {
+    const data = await getCategories();
+    setCategories(data);
   };
 
   const handleAddTask = async () => {
-    if (newTask.trim() !== "" && selectedCategory !== "") {
-      await axios.post(`${API_URL}/tasks`, { category_id: selectedCategory, task: newTask, status: "not complete" });
+    if (taskDetails.task) {
+      await addTask({ task: taskDetails.task, category_id: taskDetails.category_id, user_id: 1 });
       fetchTasks();
-      setNewTask("");
+      setOpenSnackbar(true);
+      setOpenTaskDialog(false);
     }
   };
 
-  const handleToggleTaskStatus = async (task) => {
-    const updatedStatus = task.status === "complete" ? "not complete" : "complete";
-    await axios.put(`${API_URL}/tasks/${task.id}`, { status: updatedStatus });
-    fetchTasks();
+  const handleEditTask = async () => {
+    if (taskDetails.task) {
+      await editTask(taskDetails.id, { task: taskDetails.task, category_id: taskDetails.category_id });
+      fetchTasks();
+      setOpenSnackbar(true);
+      setOpenTaskDialog(false);
+    }
   };
 
   const handleDeleteTask = async (id) => {
-    await axios.delete(`${API_URL}/tasks/${id}`);
+    await deleteTask(id);
     fetchTasks();
+  };
+
+  const handleAddCategory = async () => {
+    if (newCategory) {
+      await addCategory({ name: newCategory });
+      fetchCategories();
+      setOpenCategoryDialog(false);
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleToggleSelectTask = (taskId) => {
+    setSelectedTasks((prevSelectedTasks) => {
+      if (prevSelectedTasks.includes(taskId)) {
+        return prevSelectedTasks.filter((id) => id !== taskId); // Deselect task
+      } else {
+        return [...prevSelectedTasks, taskId]; // Select task
+      }
+    });
   };
 
   return (
     <Layout>
-      <Box sx={{ ml: 2, mt: 2, maxWidth: "90%" }}>
-        <Typography variant="h5" fontWeight="bold">Tasks</Typography>
-        
-        <Grid container spacing={1} alignItems="center" sx={{ mt: 1 }}>
-          <Grid item>
-            <Button variant="contained" size="small" onClick={() => setOpenCategoryDialog(true)} sx={{ background: "#6A80B9" }}>
+      <Container>
+        <Typography variant="h4" style={{ color: indigo[400], fontWeight: "bold", marginBottom: 15 }}>
+          Tasks
+        </Typography>
+
+        <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+          <Button
+            variant="contained"
+            onClick={() => setOpenCategoryDialog(true)}
+            style={{ backgroundColor: indigo[400], color: "white" }}
+          >
+            Add Category
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => setOpenTaskDialog(true)}
+            style={{ backgroundColor: indigo[400], color: "white" }}
+          >
+            Add Task
+          </Button>
+        </div>
+
+        {/* Tasks Table */}
+        <Typography variant="h5" style={{ color: indigo[400], fontWeight: "bold", marginTop: 40, marginBottom: 15 }}>
+          All Tasks
+        </Typography>
+
+        <TableContainer component={Paper} style={{ marginBottom: 40 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Checkbox
+                    checked={selectedTasks.length === tasks.length}
+                    onChange={() => {
+                      if (selectedTasks.length === tasks.length) {
+                        setSelectedTasks([]); // Deselect all
+                      } else {
+                        setSelectedTasks(tasks.map((task) => task.id)); // Select all
+                      }
+                    }}
+                  />
+                </TableCell>
+                <TableCell>Task</TableCell>
+                <TableCell>Category</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tasks.map((task) => (
+                <TableRow key={task.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedTasks.includes(task.id)}
+                      onChange={() => handleToggleSelectTask(task.id)}
+                    />
+                  </TableCell>
+                  <TableCell>{task.task}</TableCell>
+                  <TableCell>{categories.find((category) => category.id === task.category_id)?.name || "N/A"}</TableCell>
+                  <TableCell>{task.status ? "Completed" : "Pending"}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => {
+                      setTaskDetails({ task: task.task, category_id: task.category_id, id: task.id });
+                      setOpenTaskDialog(true);
+                    }}>
+                      <Edit style={{ color: succes[100] }} />
+                    </IconButton>
+                    <IconButton onClick={() => handleDeleteTask(task.id)}>
+                      <Delete style={{ color: danger[100] }} />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          message="Action Successful!"
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        />
+
+        {/* Task Dialog */}
+        <Dialog open={openTaskDialog} onClose={() => setOpenTaskDialog(false)}>
+          <DialogTitle>{taskDetails.id ? "Edit Task" : "Add Task"}</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Task Name"
+              fullWidth
+              value={taskDetails.task}
+              onChange={(e) => setTaskDetails({ ...taskDetails, task: e.target.value })}
+              style={{ marginBottom: 20 }}
+            />
+            <TextField
+              label="Category"
+              select
+              fullWidth
+              value={taskDetails.category_id}
+              onChange={(e) => setTaskDetails({ ...taskDetails, category_id: e.target.value })}
+              SelectProps={{
+                native: true,
+              }}
+              style={{ marginBottom: 20 }}
+            >
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </TextField>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenTaskDialog(false)} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={taskDetails.id ? handleEditTask : handleAddTask} color="primary">
+              {taskDetails.id ? "Save Changes" : "Add Task"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Category Dialog */}
+        <Dialog open={openCategoryDialog} onClose={() => setOpenCategoryDialog(false)}>
+          <DialogTitle>Add New Category</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Category Name"
+              fullWidth
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              style={{ marginBottom: 20 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenCategoryDialog(false)} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleAddCategory} color="primary">
               Add Category
             </Button>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={1} alignItems="center" sx={{ mt: 2 }}>
-          <Grid item xs={5}>
-            <TextField
-              label="tasks"
-              variant="outlined"
-              size="small"
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-
-          <Grid item xs={4}>
-            <Select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              displayEmpty
-              fullWidth
-              size="small"
-            >
-              <MenuItem value="" disabled>Category</MenuItem>
-              {categories.map((category) => (
-                <MenuItem key={category.id} value={category.id}>{category.category}</MenuItem>
-              ))}
-            </Select>
-          </Grid>
-
-          <Grid item xs={3}>
-            <Button variant="contained" size="small" startIcon={<Add />} onClick={handleAddTask} sx={{ background: "#6A80B9" }}>
-              Add Tasks
-            </Button>
-          </Grid>
-        </Grid>
-
-        <List sx={{ mt: 2 }}>
-          {tasks.map((task) => (
-            <React.Fragment key={task.id}>
-              <ListItem
-                secondaryAction={
-                  <>
-                    <Tooltip title={`Tandai sebagai ${task.status === 'complete' ? 'Belum Selesai' : 'Selesai'}`}>
-                      <IconButton size="small" onClick={() => handleToggleTaskStatus(task)}>
-                        {task.status === "complete" ? <CheckCircle color="success" /> : <RadioButtonUnchecked />}
-                      </IconButton>
-                    </Tooltip>
-                    <IconButton size="small" onClick={() => handleDeleteTask(task.id)}><Delete fontSize="small" /></IconButton>
-                  </>
-                }
-              >
-                <ListItemText primary={task.task} secondary={categories.find(cat => cat.id === task.category_id)?.category} />
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          ))}
-        </List>
-      </Box>
-
-      <Dialog open={openCategoryDialog} onClose={() => setOpenCategoryDialog(false)}>
-        <DialogTitle>Add Category</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nama Kategori"
-            fullWidth
-            variant="outlined"
-            size="small"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCategoryDialog(false)} size="small">Batal</Button>
-          <Button onClick={handleAddCategory} variant="contained" size="small" sx={{ background: "#6A80B9" }}>
-            Tambah
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </DialogActions>
+        </Dialog>
+      </Container>
     </Layout>
   );
-}
+};
+
+export default TodoApp;

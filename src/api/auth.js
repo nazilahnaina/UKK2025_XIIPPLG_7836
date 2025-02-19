@@ -21,7 +21,10 @@ export async function login(username, password) {
 export const register = async (userData) => {
     const response = await fetch("https://listyantidewi.pythonanywhere.com/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            // Authorization: `Bearer ${localStorage.getItem(Token)}`
+         },
         body: JSON.stringify(userData),
     });
 
@@ -30,4 +33,4 @@ export const register = async (userData) => {
     }
 
     return response.json();
-};
+}; 
