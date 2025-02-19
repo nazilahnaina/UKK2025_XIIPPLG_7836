@@ -16,10 +16,10 @@ export default function App() {
       <Routes>
          <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />  
-         {/* <Route path="/" element={<Navigate to="/PageTasks" />} />  */}
-         {/* <Route path="/layout" element={<Layout/>} /> 
+         {/* <Route path="/" element={<Navigate to="/PageTasks" />} />   */}
+          <Route path="/layout" element={<Layout/>} /> 
          <Route path="/tasks" element={<PageTasks/>} />
-         <Route path="/profil" element={<PageProfil/>} /> */}
+         <Route path="/profil" element={<PageProfil/>} />
 
       </Routes>
     </Router>

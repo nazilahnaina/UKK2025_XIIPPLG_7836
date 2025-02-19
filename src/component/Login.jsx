@@ -35,7 +35,7 @@ export default function Login() {
             <Button variant="contained" fullWidth onClick={handleLogin} sx={{ mt: 2 }}>Sign In</Button>
 
             <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-                Belum punya akun? <a href="/register">Sign Up</a>
+            Don’t have an account yet <a href="/register">Sign Up</a>
             </Typography>
 
         </Container>

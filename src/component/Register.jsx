@@ -48,14 +48,14 @@ export default function Register() {
 
       <TextField label="Username" fullWidth margin="normal" onChange={(e) => setUsername(e.target.value)} />
       <TextField label="Email" type="email" fullWidth margin="normal" onChange={(e) => setEmail(e.target.value)} />
-      <TextField label="Nama" fullWidth margin="normal" onChange={(e) => setName(e.target.value)} />
+      <TextField label="Name" fullWidth margin="normal" onChange={(e) => setName(e.target.value)} />
       <TextField label="Password" type="password" fullWidth margin="normal" onChange={(e) => setPassword(e.target.value)} />
-      <TextField label="Konfirmasi Password" type="password" fullWidth margin="normal" onChange={(e) => setConfirmPassword(e.target.value)} />
+      <TextField label="confirmation Password" type="password" fullWidth margin="normal" onChange={(e) => setConfirmPassword(e.target.value)} />
 
       <Button variant="contained" fullWidth onClick={handleRegister} sx={{ mt: 2 }}>Sign Up</Button>
 
       <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-        Sudah punya akun? <a href="/login">Sign In</a>
+      Already have an account? <a href="/">Sign In</a>
       </Typography>
     </Container>
   );
