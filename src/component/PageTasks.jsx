@@ -4,9 +4,9 @@ import { Edit, Delete } from "@mui/icons-material";
 import { getTasks, addTask, editTask, deleteTask } from "../api/tasks";
 import { getCategories, addCategory } from "../api/category";
 import { indigo, dark, succes, danger } from "../theme/color";
-import Layout from "./layout";
+import Layout from "./Layout";
 
-const TodoApp = () => {
+export default function PageTasks () {
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -227,5 +227,3 @@ const TodoApp = () => {
     </Layout>
   );
 };
-
-export default TodoApp;
