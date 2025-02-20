@@ -1,8 +1,18 @@
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { Logout } from "@mui/icons-material";
 import { indigo } from "../theme/color";
+import { useNavigate } from "react-router-dom";
+
 
 const Navbar = ({ onLogout }) => {
+  const navigate = useNavigate('');
+
+  const handleLogout = () => {
+    alert('Anda berhasil logout!')
+    navigate('/')
+     console.log('coba logout');
+  }
+
   return (
     <AppBar position="fixed" sx={{ backgroundColor: indigo[400], width: "100vw", zIndex: 1201, boxShadow: 3 }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -12,7 +22,7 @@ const Navbar = ({ onLogout }) => {
         <Box>
           <Button
             color="inherit"
-            onClick={onLogout}
+            onClick={handleLogout}
             startIcon={<Logout />}
             sx={{
               borderRadius: "20px",

@@ -74,7 +74,7 @@ export default function Register() {
       </form>
 
       <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-        Already have an account? <a href="/login">Sign In</a>
+        Already have an account? <a href="/">Sign In</a>
       </Typography>
     </Container>
   );

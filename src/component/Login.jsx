@@ -11,13 +11,21 @@ export default function Login() {
     const { login: setAuthUser } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
-        try {
-            const userData = await login(username, password);
-            setAuthUser(userData)
+    const userCoba = {
+        username : 'berdina',
+        password : '12345678',
+    }
+
+    const handleLogin = async (e) => {
+
+        if (username === userCoba.username && password === userCoba.password) {
+            // const userData = await login(username, password);
+            // setAuthUser(userData)
+        
             navigate("/tasks");
-        } catch {
-            setEror("Username atau password salah!");
+        } else {
+            alert("Username atau password salah!");
+           
         }
     };
 
