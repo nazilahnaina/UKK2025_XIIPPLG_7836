@@ -1,81 +1,134 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { register } from "../api/auth";
-import { Container, TextField, Button, Typography, Box } from "@mui/material";
 
-export default function Register() {
-  const [user, setUser] = useState({
+import { useState } from "react";
+import { TextField, Button, Container, Typography, Box, Alert } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
+function Register() {
+  const [formData, setFormData] = useState({
     username: "",
-    email: "",
-    name: "",
     password: "",
     confirmation: "",
+    email: "",
+    name: "",
   });
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
-    // Validasi input
-    if (!user.username || !user.email || !user.name || !user.password || !user.confirmation) {
-      setError("Semua kolom harus diisi.");
-      return;
-    }
-  
-    if (user.password.length < 8) {
-      setError("Password minimal 8 karakter.");
-      return;
-    }
-  
-    if (user.password !== user.confirmation) {
-      setError("Konfirmasi password tidak cocok.");
-      return;
-    }
-  
-    console.log("Data yang dikirim:", user); // 🔍 Cek data sebelum dikirim
-  
+
+    const form = new FormData();
+    form.append("username", formData.username);
+    form.append("password", formData.password);
+    form.append("confirmation", formData.confirmation);
+    form.append("email", formData.email);
+    form.append("name", formData.name);
+
     try {
-      await register(user);
-      console.log("Registrasi berhasil!");
-      navigate("/login");
+      const response = await fetch(
+        "https://listyantidewi.pythonanywhere.com/register",
+        {
+          method: "POST",
+          body: form,
+        }
+      );
+
+      const data = await response.text();
+
+      if (response.ok) {
+        console.log("Registration successful:", data);
+        navigate("/");
+      } else {
+        setError(data);
+        console.error("Registration failed:", data);
+      }
     } catch (error) {
-      setError(error.message || "Registrasi gagal, coba username lain.");
+      setError("Network error occurred");
+      console.error("Error during registration:", error);
     }
   };
-  
+
   return (
-    <Container maxWidth="xs">
-      <Box textAlign="center" mt={10}>
-        <Typography variant="h5">Sign Up</Typography>
-      </Box>
-
-      {error && (
-        <Typography color="error" sx={{ textAlign: "center", mt: 2 }}>
-          {error}
-        </Typography>
-      )}
-
-      <form onSubmit={handleRegister}>
-        <TextField label="Username" name="username" fullWidth margin="normal" onChange={handleChange} />
-        <TextField label="Email" name="email" type="email" fullWidth margin="normal" onChange={handleChange} />
-        <TextField label="Name" name="name" fullWidth margin="normal" onChange={handleChange} />
-        <TextField label="Password" name="password" type="password" fullWidth margin="normal" onChange={handleChange} />
-        <TextField label="Confirmation Password" name="confirmation" type="password" fullWidth margin="normal" onChange={handleChange} />
-
-        <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+    <Container maxWidth="sm">
+      <Box display="flex" flexDirection="column" alignItems="center" mt={6}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
           Sign Up
-        </Button>
-      </form>
+        </Typography>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          <TextField
+            fullWidth
+            label="Nama Lengkap"
+            variant="outlined"
+            margin="normal"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="Username"
+            variant="outlined"
+            margin="normal"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="Email"
+            type="email"
+            variant="outlined"
+            margin="normal"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            variant="outlined"
+            margin="normal"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <TextField
+            fullWidth
+            label="Konfirmasi Password"
+            type="password"
+            variant="outlined"
+            margin="normal"
+            name="confirmation"
+            value={formData.confirmation}
+            onChange={handleChange}
+            required
+          />
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2, backgroundColor: "#6A80B9" }}>
+            Sign Up
+          </Button>
 
-      <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-        Already have an account? <a href="/">Sign In</a>
-      </Typography>
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            Already have an account? <a href="/">Sign In</a>
+          </Typography>
+        </form>
+      </Box>
     </Container>
   );
 }
+
+export default Register;
